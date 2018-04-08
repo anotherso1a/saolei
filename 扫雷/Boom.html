@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>clear boom</title>
+    <style>
+    .container{
+      position: absolute;
+      width: 400px;
+      height: 600px;
+      top: 32px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      background-color: #C0C0C0;
+    }
+    .unit{
+      float: left;
+      width: 20px;
+      height: 20px;
+      box-sizing: border-box;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      background-color: #ddd;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 20px;
+    }
+    .unit:hover{
+      /*background-color: #C0C0C0;*/
+      border: 2px solid #0188FB;
+    }
+    .showed{
+      background-color: #C0C0C0;
+      border: 1px solid #888888;
+    }
+    .flag{
+      background-image: url(flag.png);
+      background-size:100% 100%;
+    }
+
+    .time{
+      position: absolute;
+      width: 100%;
+      height: 40px;
+      left: 0;
+      top: -40px;
+      line-height: 40px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;	
+      background-color: #0188FB;
+      cursor: pointer;
+    }
+    .changemodule{
+        position: absolute;
+	    width: 120px;
+	    height: 40px;
+	    top: 60px;
+	    left: -120px;
+	    line-height: 36px;
+	    text-align: center;
+	    font-size: 18px;
+	    font-weight: 700;
+	    color: gray;
+	    /* background-color: yellow; */
+	    border: 2px solid gray;
+	    box-sizing: border-box;
+    }
+    .boomNum {
+	    position: absolute;
+	    width: 70px;
+	    height: 40px;
+	    top: 0;
+	    left: -70px;
+	    line-height: 36px;
+	    text-align: center;
+	    font-size: 18px;
+	    font-weight: 700;
+	    color: red;
+	    /* background-color: yellow; */
+	    border: 2px solid gray;
+	    box-sizing: border-box;
+	}
+	.success{
+		background-color: #1CA261;
+	}
+    </style>
+    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--  <script src="script/jquery-2.1.4.min.js"></script> -->
+  </head>
+  <body>
+    <div class="container">
+      <div class="time"></div>
+      <div class="boomNum"></div>
+      <input value="level(1-100)" class="changemodule"/>
+    </div>
+
+  </body>
+  <script type="text/javascript">
+  	var Gametime = 0; //全局变量
+  	var clm = 20;
+    var row = 30;
+
+    function calender(){
+		if ($(".unit[showed=true]").length>0) {
+			if (Gametime==0) {
+				Gametime=setInterval(function(){	
+		        	if($(".unit[showed=true]").length+$(".unit[boom=1]").length==clm*row){
+		        		clearInterval(Gametime);
+		        	}else if($(".time").attr("gg") == 1){
+		        		clearInterval(Gametime);
+		        	}else if ($(".unit[showed=true]").length+$(".unit[boom=1]").length!=clm*row && $(".time").attr("gg") == 0) {
+		        		$(".time").html(parseInt($(".time").text())+1);
+		        	}
+		        	
+		        },1000)
+			}else{
+				return;
+			}
+    		
+    	}
+	}
+	$(".changemodule").focus(function(){
+		$(this).select();
+	})
+	$(".changemodule").blur(function(){
+		var level = $(this).val();
+		clearInterval(Gametime);
+		Gametime = 0;
+		$(".unit").remove();
+		initGame(level);
+	})
+
+    $(document).ready(function(){
+    	var level = $(".changemodule").val();
+    	initGame(level);
+    	$(".time").click(function(){
+    		level = $(".changemodule").val();
+    		clearInterval(Gametime);
+    		Gametime = 0;
+    		$(".unit").remove();
+    		initGame(level);
+    	})
+    })
+
+    function initGame(levelNum){
+    	//屏蔽鼠标右键
+	    $("div").bind("contextmenu", function(){
+	        return false;
+	    })
+	    $(".time").removeClass("success");
+
+
+
+	    
+	    var timeStart=null
+	    var timeEnd = null
+	    var time =null;//申明全局变量 
+	    
+	    var level = 0.18;//难度 设为0.05至0.35之间
+	    var GameStart = 0;
+
+	    if (levelNum>=0&&levelNum<=100) {
+	    	level = 0.05+(levelNum/100)*0.3;
+	    }else{
+	    	level = 0.18;
+	    }
+
+	    
+	    for (var i = 0; i < row*clm; i++) {
+	      $(".container").append('<div class="unit" id="'+i+'"></div>')
+	      $("#"+i).attr("x",i%clm)
+	      $("#"+i).attr("y",Math.floor(i/clm))
+	      if (Math.random()<level) {
+	        $("#"+i).attr("boom",1)
+	      }else{
+	        $("#"+i).attr("boom",0)
+	      }
+	    }
+
+
+	    $(".boomNum").html($(".unit[boom=1]").length);
+	    $(".time").html("0")
+	    
+	    //点击事件
+	    // $('.unit').click(function(){
+	      
+	    // })
+	    
+	    $(".unit").mouseup(function checkFlag(e) {
+	        //alert(e.which);
+	        holdUp();
+	        if (GameStart == 0) {
+	        	GameStart=getTimeNow()
+	        }
+	        $(".time").attr("gg",0);//游戏开始
+	        // Gametime=setInterval(function(){	
+	        // 	if($(".unit[showed=true]").length+$(".unit[boom=1]").length==clm*row){
+	        // 		clearInterval(Gametime);
+	        // 	}else if($(".time").attr("gg") == 1){
+	        // 		clearInterval(Gametime);
+	        // 	}else if ($(".unit[showed=true]").length+$(".unit[boom=1]").length!=clm*row && $(".time").attr("gg") == 0) {
+	        // 		$(".time").html(parseInt($(".time").text())+1);
+	        // 	}
+	        	
+	        // },1000)
+	        if (e.which==1) {
+	        	timeEnd=getTimeNow();
+	        	if(timeEnd-timeStart<=500){
+	        		var x = parseInt($(this).attr('x'))
+			        var y = parseInt($(this).attr('y'))
+			     
+			        if ($(this).attr("boom")==1) {//踩到炸弹，游戏结束
+			        	$(".time").attr("gg",1);
+			        	clearInterval(Gametime);//停止游戏时间
+			        	$(".unit[boom=1]").css({"background-image":"url(boom.png)","background-size":"100% 100%","background-color": "red","border": "1px solid #888888","font-size":"24px","line-height":"15px"})
+			        	//$(".unit[boom=1]").html("●");
+			        	$('.unit').unbind("mousedown")
+			        	$('.unit').unbind("mouseup")
+			        	$(".time").html("GAME OVER")
+			        }else{
+			        	var result = check(x,y);
+			        	//alert(result);
+			        	calender()//计时
+			        	if ($(".unit[showed=true]").length+$(".unit[boom=1]").length==clm*row) {
+			        		$(".time").addClass("success");
+			        		alert("seccess!")
+			        	}
+			        }
+	        	}	
+	        }
+	        //右键为3
+	        //右键插旗
+	        if (3 == e.which) {
+	          if ($(this).attr("flag")==1) {
+	            $(this).removeClass("flag");
+	            $(this).attr("flag",0);
+	          }else if($(this).attr("flag")!=1 && !$(this).attr("showed")){
+	          	if ($(".unit[boom=1]").length - $(".unit[flag=1]").length == 0) {
+	          		return;
+	          	}
+	            $(this).addClass("flag");
+	            $(this).attr("flag",1);
+	          }
+	          $(".boomNum").html($(".unit[boom=1]").length - $(".unit[flag=1]").length)
+	        }
+	    })
+	    //或鼠标长按触发插旗事件
+	    $(".unit").mousedown(function(){
+	    	var id = $(this).attr('id')
+
+	    	timeStart=getTimeNow();//获取鼠标按下时的时间  
+	        time=setInterval(function()//setInterval会每100毫秒执行一次  
+	        {  
+	            timeEnd=getTimeNow();//也就是每100毫秒获取一次时间  
+	            
+	            if(timeEnd-timeStart>500)//如果此时检测到的时间与第一次获取的时间差有500毫秒  
+	            {  
+	    　　　     if ($("#"+id).attr("flag")==1) {
+		               $("#"+id).removeClass("flag");
+		               $("#"+id).attr("flag",0);
+		            }else if($("#"+id).attr("flag")!=1 && !$("#"+id).attr("showed")){
+		               $("#"+id).addClass("flag");
+		               $("#"+id).attr("flag",1);
+		            }
+		            //alert(time)
+		            clearInterval(time);//便不再继续重复此函数 （clearInterval取消周期性执行）  
+	            }  
+	        },100); 
+	    })
+	    
+	              
+	    function getTimeNow()//获取此刻时间  
+	    {  
+	        var now=new Date();  
+	        return now.getTime();  
+	    } 
+	    function holdUp()  
+	    {  
+	        clearInterval(time);//如果按下时间不到1000毫秒便弹起，  
+	    }
+
+
+	    //重设游戏
+	    // $(".time").click(function(){
+	    // 	$(".unit").remove();
+	    // 	$(".time").html("0")
+	    // 	GameStart = 0;
+	    // 	for (var i = 0; i < row*clm; i++) {
+		   //    $(".container").append('<div class="unit" id="'+i+'"></div>')
+		   //    $("#"+i).attr("x",i%clm)
+		   //    $("#"+i).attr("y",Math.floor(i/clm))
+		   //    if (Math.random()<level) {
+		   //      $("#"+i).attr("boom",1)
+		   //    }else{
+		   //      $("#"+i).attr("boom",0)
+		   //    }
+		   //  }
+		   //  $(".boomNum").html($(".unit[boom=1]").length);
+	    // })
+
+	    // $(".unit").hover(function(){
+	    //   $(document).mouseup(function(event){
+	    //     var btnNum = event.button;
+	    //     if (btnNum==2)
+	    //     {
+	    //     //alert("您点击了鼠标右键！")
+	    //       $(this).attr("flag",true);
+	    //       $(this).css("background-color","green") ; 
+	    //     }
+	    //   })
+	    //   },function(){
+	    //   //$("p").css("background-color","pink");
+	    // });
+
+	    function check(x,y){
+	      if (x<0||x>=clm||y<0||y>=row) {return}
+	      if ($(".unit[x="+x+"][y="+y+"]").attr("showed") || $(".unit[x="+x+"][y="+y+"]").attr("flag")==1) {return}
+	      var result = 0;
+	      if ($(".unit[x="+(x-1)+"][y="+(y-1)+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+(x-1)+"][y="+(y-1)+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+x+"][y="+(y-1)+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+x+"][y="+(y-1)+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+(x+1)+"][y="+(y-1)+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+(x+1)+"][y="+(y-1)+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+(x-1)+"][y="+y+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+(x-1)+"][y="+y+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+(x+1)+"][y="+y+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+(x+1)+"][y="+y+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+(x-1)+"][y="+(y+1)+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+(x-1)+"][y="+(y+1)+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+x+"][y="+(y+1)+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+x+"][y="+(y+1)+"]").attr("boom") )
+	      }
+	      if ($(".unit[x="+(x+1)+"][y="+(y+1)+"]").length != 0) {
+	        result+= parseInt($(".unit[x="+(x+1)+"][y="+(y+1)+"]").attr("boom") )
+	      } 
+
+	     // return result;
+
+	      if (result==0) {
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        // var tlx = x-1;
+	        // var tly = y-1;
+	        check(x-1,y-1)
+
+	        // var tmx = x;
+	        // var tmy = y-1;
+	        check(x,y-1)
+
+	        // var trx = x+1;
+	        // var tryy = y-1;
+	        check(x+1,y-1)
+
+	        // var mlx = x-1;
+	        // var mly = y;
+	        check(x-1,y);
+
+	        // var mrx = x+1;
+	        // var mry = y;
+	        check(x+1,y)
+
+	        // var blx = x-1;
+	        // var bly = y+1;
+	        check(x-1,y+1)
+
+	        // var bmx = x;
+	        // var bmy = y+1;
+	        check(x,y+1)
+
+	        // var brx = x+1;
+	        // var bry = y+1;
+	        check(x+1,y+1)
+	        
+	      }
+	      if (result==1) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#0000FF")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==2) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#008100")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==3) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#FF0000")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==4) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#000081")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==5) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#810000")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==6) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#008181")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==7) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result)
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#000000")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      if (result==8) {
+	        $(".unit[x="+x+"][y="+y+"]").html(result) 
+	        $(".unit[x="+x+"][y="+y+"]").css("color","#818181")
+	        $(".unit[x="+x+"][y="+y+"]").addClass("showed")
+	        $(".unit[x="+x+"][y="+y+"]").attr("showed",true)
+	        return;
+	      }
+	      
+	    }
+    }
+    
+  </script>
+</html>
