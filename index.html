@@ -38,7 +38,7 @@
       border: 1px solid #888888;
     }
     .flag{
-      background-image: url(flag.png);
+      background-image: url(static/flag.png);
       background-size:100% 100%;
     }
 
@@ -218,7 +218,7 @@
 			        if ($(this).attr("boom")==1) {//踩到炸弹，游戏结束
 			        	$(".time").attr("gg",1);
 			        	clearInterval(Gametime);//停止游戏时间
-			        	$(".unit[boom=1]").css({"background-image":"url(boom.png)","background-size":"100% 100%","background-color": "red","border": "1px solid #888888","font-size":"24px","line-height":"15px"})
+			        	$(".unit[boom=1]").css({"background-image":"url(static/boom.png)","background-size":"100% 100%","background-color": "red","border": "1px solid #888888","font-size":"24px","line-height":"15px"})
 			        	//$(".unit[boom=1]").html("●");
 			        	$('.unit').unbind("mousedown")
 			        	$('.unit').unbind("mouseup")
